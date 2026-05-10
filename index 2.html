@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Global Spin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background: #0a0a0a; /* Black theme */
+            font-family: 'Poppins', sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden; color: white;
+        }
+
+        /* Scrolling Flags Section */
+        .scrolling-countries {
+            width: 100%; height: 50px;
+            background: #1a1a1a;
+            display: flex; align-items: center;
+            overflow: hidden; border-bottom: 2px solid #d4af37;
+        }
+
+        .flag-track {
+            display: flex; width: calc(250px * 10);
+            animation: scroll 20s linear infinite;
+        }
+
+        .country-item {
+            width: 250px; display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-weight: bold; color: #d4af37;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* App Container */
+        .app-card {
+            width: 360px; height: 680px;
+            background: linear-gradient(145deg, #1a1a1a, #000);
+            margin-top: 20px; border-radius: 40px;
+            border: 2px solid #d4af37; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+            display: flex; flex-direction: column; align-items: center;
+            position: relative;
+        }
+
+        h2 {
+            font-family: 'Cinzel', serif; color: #d4af37;
+            margin-top: 30px; letter-spacing: 3px; text-shadow: 0 0 10px #d4af37;
+        }
+
+        /* Wheel Design */
+        .wheel-container {
+            position: relative; width: 310px; height: 310px; margin-top: 40px;
+        }
+
+        .wheel-container::after {
+            content: '▼'; position: absolute; top: -20px; left: 50%;
+            transform: translateX(-50%); font-size: 30px; color: #d4af37; z-index: 10;
+        }
+
+        .wheel {
+            width: 100%; height: 100%; border-radius: 50%;
+            border: 8px solid #d4af37; position: relative;
+            overflow: hidden; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1);
+            background: #000;
+        }
+
+        .segment {
+            position: absolute; width: 50%; height: 50%;
+            transform-origin: 100% 100%; display: flex;
+            align-items: center; justify-content: center;
+        }
+
+        /* Pata wenas kala: Black and Dark Grey */
+        .segment:nth-child(1) { background: #111; transform: rotate(0deg); }
+        .segment:nth-child(2) { background: #222; transform: rotate(90deg); }
+        .segment:nth-child(3) { background: #111; transform: rotate(180deg); }
+        .segment:nth-child(4) { background: #222; transform: rotate(270deg); }
+
+        .segment-content {
+            transform: rotate(45deg); display: flex; flex-direction: column;
+            align-items: center; margin-bottom: -50px; margin-right: -50px;
+        }
+
+        .segment-content b {
+            color: #d4af37; font-size: 14px; font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+
+        .spin-btn {
+            margin-top: 70px; width: 80%; padding: 15px;
+            background: #d4af37; color: black; border: none;
+            border-radius: 10px; font-size: 18px; font-weight: bold;
+            font-family: 'Cinzel', serif; cursor: pointer;
+            box-shadow: 0 0 15px #d4af3766; transition: 0.3s;
+        }
+
+        .spin-btn:hover { background: #fff; transform: scale(1.05); }
+
+        #result {
+            margin-top: 40px; font-size: 20px; font-weight: bold;
+            color: #fff; text-shadow: 0 0 5px #d4af37;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scrolling-countries">
+        <div class="flag-track">
+            <div class="country-item">🇦🇪 DUBAI</div>
+            <div class="country-item">🇨🇳 CHINA</div>
+            <div class="country-item">🇺🇸 USA</div>
+            <div class="country-item">🇱🇰 SRI LANKA</div>
+            <div class="country-item">🇬🇧 UK</div>
+            <div class="country-item">🇦🇪 DUBAI</div>
+            <div class="country-item) ">🇨🇳 CHINA</div>
+            <div class="country-item">🇺🇸 USA</div>
+            <div class="country-item">🇱🇰 SRI LANKA</div>
+            <div class="country-item">🇬🇧 UK</div>
+        </div>
+    </div>
+
+    <div class="app-card">
+        <h2>LUCKY LUXURY</h2>
+
+        <div class="wheel-container">
+            <div class="wheel" id="wheel">
+                <div class="segment"><div class="segment-content"><b>WATCH</b></div></div>
+                <div class="segment"><div class="segment-content"><b>MONEY</b></div></div>
+                <div class="segment"><div class="segment-content"><b>DRESS</b></div></div>
+                <div class="segment"><div class="segment-content"><b>PERFUME</b></div></div>
+            </div>
+        </div>
+
+        <button class="spin-btn" onclick="spinNow()">SPIN NOW</button>
+        
+        <div id="result">Click to Win Premium Gifts</div>
+    </div>
+
+    <script>
+        let currentRotation = 0;
+        let isSpinning = false;
+
+        function spinNow() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            const wheel = document.getElementById('wheel');
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = "Spinning...";
+
+            const extraSpins = 3600; // 10 rounds
+            const randomDegree = Math.floor(Math.random() * 360);
+            currentRotation += (extraSpins + randomDegree);
+
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                
+                // --- KELINMA LOGIC EKA FIX KARA ---
+                // Wheel eka karakena nisa pointer ekata ena segment eka hoyanna:
+                const actualRotation = currentRotation % 360;
+                
+                // Pointer eka thiyenne top (90 degrees counter to rotation)
+                // Segments 4 nisa 90 degrees walin bedanawa
+                let winningIndex = Math.floor(((360 - actualRotation + 45) % 360) / 90);
+                
+                const prizes = ["WATCH", "PERFUME", "DRESS", "MONEY"];
+                
+                let win;
+                if(winningIndex === 0) win = "PREMIUM WATCH ⌚";
+                else if(winningIndex === 1) win = "PERFUME 🧴";
+                else if(winningIndex === 2) win = "DRESS 👗";
+                else if(winningIndex === 3) win = "CASH MONEY 💵";
+
+                resultDiv.innerHTML = "WINNER: " + win;
+            }, 5000);
+        }
+    </script>
+
+</body>
+</html>

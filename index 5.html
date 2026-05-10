@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Gift Spinner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --black: #0f0f0f;
+            --blue: #00d2ff;
+        }
+
+        body {
+            margin: 0; background: var(--black); font-family: 'Poppins', sans-serif;
+            display: flex; justify-content: center; align-items: center; height: 100vh;
+            color: white; overflow: hidden;
+        }
+
+        .app-shell {
+            width: 360px; height: 720px; background: linear-gradient(180deg, #1a1a1a, #000);
+            border-radius: 40px; border: 2px solid var(--gold); position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+        }
+
+        h2 { font-family: 'Orbitron', sans-serif; color: var(--gold); margin-top: 40px; letter-spacing: 2px; }
+
+        /* Wheel Wrapper */
+        .wheel-box { position: relative; width: 300px; height: 300px; margin-top: 60px; }
+        
+        /* Pointer */
+        .wheel-box::after {
+            content: '▼'; position: absolute; top: -25px; left: 50%;
+            transform: translateX(-50%); font-size: 40px; color: #ff0000; z-index: 10;
+            text-shadow: 0 0 10px rgba(255,0,0,0.5);
+        }
+
+        .wheel {
+            width: 100%; height: 100%; border-radius: 50%; border: 8px solid var(--gold);
+            position: relative; overflow: hidden; transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1);
+            background: #fff;
+        }
+
+        .seg {
+            position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .seg:nth-child(1) { background: #111; transform: rotate(0deg); }
+        .seg:nth-child(2) { background: #222; transform: rotate(90deg); }
+        .seg:nth-child(3) { background: #111; transform: rotate(180deg); }
+        .seg:nth-child(4) { background: #222; transform: rotate(270deg); }
+
+        .seg b { transform: rotate(45deg); color: var(--gold); font-size: 16px; margin-bottom: -60px; margin-right: -60px; }
+
+        /* Spin Button */
+        .spin-btn {
+            margin-top: 80px; width: 220px; padding: 18px; border-radius: 50px;
+            background: var(--gold); border: none; font-size: 20px; font-weight: bold;
+            cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.4); transition: 0.2s;
+        }
+        .spin-btn:active { transform: scale(0.95); }
+
+        #msg { margin-top: 40px; font-size: 22px; color: var(--blue); font-weight: bold; text-align: center; }
+
+    </style>
+</head>
+<body>
+
+    <audio id="spinSound" src="https://www.soundjay.com/misc/sounds/bell-ring-01.mp3"></audio> <audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-01.mp3"></audio>
+
+    <div class="app-shell">
+        <h2>GIFT SPINNER</h2>
+
+        <div class="wheel-box">
+            <div class="wheel" id="wheel">
+                <div class="seg"><b>WATCH</b></div>
+                <div class="seg"><b>MONEY</b></div>
+                <div class="seg"><b>DRESS</b></div>
+                <div class="seg"><b>PERFUME</b></div>
+            </div>
+        </div>
+
+        <button class="spin-btn" onclick="startSpin()">SPIN NOW</button>
+        
+        <div id="msg">What's your luck?</div>
+    </div>
+
+    <script>
+        let currentRotation = 0;
+        let isSpinning = false;
+        
+        const spinAudio = document.getElementById('spinSound');
+        const winAudio = document.getElementById('winSound');
+
+        function startSpin() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            const wheel = document.getElementById('wheel');
+            const msg = document.getElementById('msg');
+            msg.innerHTML = "Spinning...";
+
+            // Sound play කරන්න
+            spinAudio.currentTime = 0;
+            spinAudio.play();
+
+            const rounds = 3600; 
+            const rand = Math.floor(Math.random() * 360);
+            currentRotation += (rounds + rand);
+
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            // තත්පර 5කට පස්සේ result එක සහ win sound එක
+            setTimeout(() => {
+                isSpinning = false;
+                spinAudio.pause(); // Spin sound එක නවත්තනවා
+                winAudio.play();   // Win sound එක දානවා
+
+                const deg = currentRotation % 360;
+                let idx = Math.floor(((360 - deg + 45) % 360) / 90);
+                const items = ["WATCH", "PERFUME", "DRESS", "MONEY"];
+                
+                msg.innerHTML = "🎉 YOU WON: " + items[idx] + "! 🎉";
+            }, 5000);
+        }
+    </script>
+
+</body>
+</html>

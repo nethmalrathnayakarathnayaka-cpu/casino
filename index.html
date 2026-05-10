@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Spinner</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1a1a2e;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            flex-direction: column;
+            color: white;
+        }
+
+        .container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+        }
+
+        /* Pointer එක */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #f00;
+            z-index: 10;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 10px solid #fff;
+            position: relative;
+            overflow: hidden;
+            transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* කොටස් 4කට වෙන් කිරීම (90deg බැගින්) */
+        .segment:nth-child(1) { 
+            background: #e74c3c; 
+            transform: rotate(0deg); 
+        }
+        .segment:nth-child(2) { 
+            background: #3498db; 
+            transform: rotate(90deg); 
+        }
+        .segment:nth-child(3) { 
+            background: #2ecc71; 
+            transform: rotate(180deg); 
+        }
+        .segment:nth-child(4) { 
+            background: #f1c40f; 
+            transform: rotate(270deg); 
+            color: #333;
+        }
+
+        .segment span {
+            transform: rotate(45deg);
+            margin-bottom: -50px;
+            margin-right: -50px;
+        }
+
+        .spin-btn {
+            margin-top: 50px;
+            padding: 15px 50px;
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 8px #951a2d;
+            transition: 0.2s;
+        }
+
+        .spin-btn:active {
+            box-shadow: 0 2px #951a2d;
+            transform: translateY(4px);
+        }
+
+        #status {
+            margin-top: 25px;
+            font-size: 24px;
+            height: 30px;
+            color: #00d2ff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="wheel" id="wheel">
+            <div class="segment"><span>WATCH</span></div>
+            <div class="segment"><span>PERFUME</span></div>
+            <div class="segment"><span>DRESS</span></div>
+            <div class="segment"><span>MONEY</span></div>
+        </div>
+    </div>
+
+    <button class="spin-btn" onclick="spinNow()">Spin Now</button>
+    
+    <div id="status">Good Luck!</div>
+
+    <script>
+        let currentRotation = 0;
+
+        function spinNow() {
+            const wheel = document.getElementById('wheel');
+            const status = document.getElementById('status');
+            
+            status.innerHTML = "Spinning...";
+
+            // අලුත් කැරකීමක් (අවම වට 5ක් + random ප්‍රමාණයක්)
+            const addedRotation = Math.floor(Math.random() * 360) + 1800; 
+            currentRotation += addedRotation;
+            
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            // තත්පර 5කට පසු result එක පෙන්වන්න
+            setTimeout(() => {
+                const actualDeg = currentRotation % 360;
+                calculateWinner(actualDeg);
+            }, 5000);
+        }
+
+        function calculateWinner(deg) {
+            const status = document.getElementById('status');
+            // Pointer එක තියෙන්නේ උඩ නිසා, ඒ අනුව logic එක (0-360)
+            // මේකේ items 4ක් තියෙන නිසා 90deg බැගින් බෙදෙනවා
+            
+            // Pointer එකට සාපේක්ෂව දිනපු දේ තෝරමු
+            let gift = "";
+            const normalizedDeg = (360 - (deg % 360)) % 360;
+
+            if (normalizedDeg >= 0 && normalizedDeg < 90) gift = "WATCH";
+            else if (normalizedDeg >= 90 && normalizedDeg < 180) gift = "MONEY";
+            else if (normalizedDeg >= 180 && normalizedDeg < 270) gift = "DRESS";
+            else gift = "PERFUME";
+
+            status.innerHTML = "You Won: " + gift + "! 🎉";
+        }
+    </script>
+
+</body>
+</html>

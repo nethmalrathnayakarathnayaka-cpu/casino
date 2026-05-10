@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Trade & Spin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --bg: #050505;
+            --green: #00ff88;
+            --red: #ff4d4d;
+            --blue: #00d2ff;
+        }
+
+        body {
+            margin: 0; background: var(--bg); font-family: 'Poppins', sans-serif;
+            color: white; display: flex; justify-content: center; align-items: center; height: 100vh;
+        }
+
+        .app-shell {
+            width: 360px; height: 750px; background: #111; border-radius: 40px;
+            border: 1px solid #333; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* Header / Wallet */
+        .header {
+            padding: 20px; background: #1a1a1a; border-bottom: 1px solid #333;
+            text-align: center;
+        }
+        .balance-tag { font-size: 10px; color: #888; letter-spacing: 1px; }
+        .balance-val { font-family: 'Orbitron', sans-serif; font-size: 24px; color: var(--blue); }
+
+        /* Navigation Tabs */
+        .nav-tabs { display: flex; background: #151515; }
+        .tab { 
+            flex: 1; padding: 15px; text-align: center; cursor: pointer; 
+            font-size: 12px; font-weight: bold; border-bottom: 2px solid transparent;
+        }
+        .tab.active { border-color: var(--blue); color: var(--blue); background: #1a1a1a; }
+
+        .page { display: none; flex-direction: column; align-items: center; padding: 20px; height: 100%; }
+        .page.active { display: flex; }
+
+        /* --- Binary Trading Page Style --- */
+        #chart-container {
+            width: 100%; height: 200px; background: #000; border: 1px solid #222;
+            margin-top: 10px; border-radius: 10px; position: relative;
+        }
+        canvas { width: 100%; height: 100%; }
+
+        .trade-controls {
+            width: 100%; margin-top: 20px; display: flex; flex-direction: column; gap: 15px;
+        }
+        .input-group { background: #1a1a1a; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; }
+        .trade-btns { display: flex; gap: 10px; }
+        .t-btn { 
+            flex: 1; padding: 15px; border-radius: 10px; border: none; 
+            font-weight: bold; font-size: 16px; cursor: pointer; 
+        }
+        .up { background: var(--green); color: #000; }
+        .down { background: var(--red); color: #fff; }
+
+        /* --- Spin Page Style (Same as before but compact) --- */
+        .wheel-wrap { position: relative; width: 250px; height: 250px; margin-top: 30px; }
+        .wheel-wrap::before { content: '▼'; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); color: var(--gold); z-index: 5; font-size: 20px; }
+        .wheel { 
+            width: 100%; height: 100%; border-radius: 50%; border: 5px solid var(--gold); 
+            position: relative; overflow: hidden; transition: 5s cubic-bezier(0.1,0,0.1,1);
+        }
+        .seg { position: absolute; width: 50%; height: 50%; transform-origin: 100% 100%; background: #111; border: 0.1px solid #222; }
+        .seg:nth-child(2) { transform: rotate(90deg); background: #181818; }
+        .seg:nth-child(3) { transform: rotate(180deg); background: #111; }
+        .seg:nth-child(4) { transform: rotate(270deg); background: #181818; }
+        .spin-trigger { 
+            margin-top: 30px; padding: 15px 40px; border-radius: 30px; 
+            background: var(--gold); border: none; font-weight: bold; cursor: pointer;
+        }
+
+        .footer-info { margin-top: auto; padding-bottom: 40px; font-size: 11px; color: #555; text-align: center; }
+
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+    <div class="header">
+        <div class="balance-tag">TOTAL EQUITY</div>
+        <div class="balance-val" id="main-balance">$ 5,000.00</div>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="tab active" onclick="switchPage('trade', this)">TRADING</div>
+        <div class="tab" onclick="switchPage('spin', this)">CASINO SPIN</div>
+    </div>
+
+    <div id="trade" class="page active">
+        <div style="width: 100%; display: flex; justify-content: space-between; font-size: 12px;">
+            <span>BTC/USDT</span>
+            <span style="color: var(--green);" id="price-ticker">42,150.20</span>
+        </div>
+        <div id="chart-container">
+            <canvas id="tradeChart"></canvas>
+        </div>
+
+        <div class="trade-controls">
+            <div class="input-group">
+                <span>Amount:</span>
+                <span style="color: var(--blue);">$ 100.00</span>
+            </div>
+            <div class="input-group">
+                <span>Payout:</span>
+                <span style="color: var(--green);">92% ($ 192.00)</span>
+            </div>
+            <div class="trade-btns">
+                <button class="t-btn up" onclick="placeTrade('up')">HIGHER</button>
+                <button class="t-btn down" onclick="placeTrade('down')">LOWER</button>
+            </div>
+        </div>
+        <div id="trade-msg" style="margin-top: 15px; font-size: 13px; color: #888;">Select direction...</div>
+    </div>
+
+    <div id="spin" class="page">
+        <div class="wheel-wrap">
+            <div class="wheel" id="wheel">
+                <div class="seg" style="display:flex; align-items:center; justify-content:center;"><b style="transform:rotate(45deg); font-size:10px; color:var(--gold);">WATCH</b></div>
+                <div class="seg" style="display:flex; align-items:center; justify-content:center;"><b style="transform:rotate(45deg); font-size:10px; color:var(--gold);">MONEY</b></div>
+                <div class="seg" style="display:flex; align-items:center; justify-content:center;"><b style="transform:rotate(45deg); font-size:10px; color:var(--gold);">DRESS</b></div>
+                <div class="seg" style="display:flex; align-items:center; justify-content:center;"><b style="transform:rotate(45deg); font-size:10px; color:var(--gold);">PERFUME</b></div>
+            </div>
+        </div>
+        <button class="spin-trigger" onclick="runSpin()">SPIN ($50)</button>
+        <div id="spin-msg" style="margin-top: 20px; color: var(--gold);">Win Luxury Items!</div>
+    </div>
+
+    <div class="footer-info">Secure Encryption • 24/7 Support</div>
+</div>
+
+<script>
+    let balance = 5000;
+    let currentRotation = 0;
+
+    // Switch Pages
+    function switchPage(pageId, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        el.classList.add('active');
+    }
+
+    function updateUI() {
+        document.getElementById('main-balance').innerHTML = "$ " + balance.toLocaleString();
+    }
+
+    // --- Trading Logic ---
+    const canvas = document.getElementById('tradeChart');
+    const ctx = canvas.getContext('2d');
+    let points = Array(30).fill(100);
+
+    function drawChart() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#00d2ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        let xStep = canvas.width / 29;
+        points.forEach((p, i) => {
+            ctx.lineTo(i * xStep, p);
+        });
+        ctx.stroke();
+        
+        // Simulating price movement
+        points.shift();
+        let last = points[points.length - 1];
+        let next = last + (Math.random() - 0.5) * 10;
+        if (next < 20) next = 20; if (next > 180) next = 180;
+        points.push(next);
+        
+        document.getElementById('price-ticker').innerHTML = (42000 + next).toFixed(2);
+    }
+    setInterval(drawChart, 200);
+
+    function placeTrade(dir) {
+        if (balance < 100) return alert("Low balance!");
+        balance -= 100;
+        updateUI();
+        let msg = document.getElementById('trade-msg');
+        msg.innerHTML = "Position Opened... Waiting 3s";
+        
+        setTimeout(() => {
+            let win = Math.random() > 0.5;
+            if (win) {
+                balance += 192;
+                msg.innerHTML = "WINNER! +$92.00 ✅";
+                msg.style.color = "var(--green)";
+            } else {
+                msg.innerHTML = "LOST! -$100.00 ❌";
+                msg.style.color = "var(--red)";
+            }
+            updateUI();
+        }, 3000);
+    }
+
+    // --- Spin Logic ---
+    function runSpin() {
+        if (balance < 50) return alert("Low balance!");
+        balance -= 50; updateUI();
+        
+        const wheel = document.getElementById('wheel');
+        const rand = Math.floor(Math.random() * 360) + 3600;
+        currentRotation += rand;
+        wheel.style.transform = `rotate(${currentRotation}deg)`;
+        
+        setTimeout(() => {
+            let deg = currentRotation % 360;
+            let idx = Math.floor(((360 - deg + 45) % 360) / 90);
+            const items = ["WATCH", "PERFUME", "DRESS", "MONEY"];
+            document.getElementById('spin-msg').innerHTML = "WON: " + items[idx];
+            if(idx === 1) balance += 200; // Money won
+            updateUI();
+        }, 5000);
+    }
+</script>
+
+</body>
+</html>
